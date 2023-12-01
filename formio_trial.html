@@ -1,0 +1,192 @@
+<html>
+
+<head>
+  <!-- <link rel='stylesheet' href='https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css'> -->
+  <!-- <link rel='stylesheet' href='https://cdn.form.io/formiojs/formio.full.min.css'> -->
+  <!-- <script src='https://cdn.form.io/formiojs/formio.full.min.js'></script> -->
+
+
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/formiojs@3.9.0/dist/formio.full.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism-okaidia.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <style>
+    body {
+      padding: 20px;
+    }
+
+    .tab-content.container {
+      border: 1px solid #ddd;
+      border-top: none;
+      padding-top: 15px;
+      padding-bottom: 15px;
+    }
+
+    pre {
+      height: 450px;
+      overflow-y: scroll;
+    }
+
+    body {
+      padding: 20px;
+    }
+
+
+    /* .control-label{
+      font-size: 20px;
+      color: red;
+    } */
+  </style>
+
+
+
+</head>
+
+<body>
+  <div id='formio'></div>
+
+  <div class="container mt-3">
+    <ul class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active">
+        <a href="#builder" role="tab" data-toggle="tab">Builder</a>
+      </li>
+      <li role="presentation">
+        <a href="#form" role="tab" data-toggle="tab">Form</a>
+      </li>
+      <li role="presentation">
+        <a href="#result" role="tab" data-toggle="tab">Result</a>
+      </li>
+      <!-- <li role="presentation">
+                <a href="#form" role="tab" data-toggle="tab">Form</a>
+            </li> -->
+      <!-- <li role="presentation">
+                <a href="#result" role="tab" data-toggle="tab">
+            </li> -->
+    </ul>
+    <div class="tab-content container">
+      <div class="tab-pane fade in active" id="builder" role="tabpanel">
+        <div id="formio-builder"></div>
+      </div>
+      <div class="tab-pane fade" id="form" role="tabpanel">
+        <pre><code class="language-javascript"></code></pre>
+      </div>
+      <div class="tab-pane fade" id="result" role="tabpanel">
+        <form id="formio-form">
+          Form not initialized
+        </form>
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/formiojs@3.9.0/dist/formio.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-json.min.js"></script>
+  <script type='text/javascript'>
+    //   window.onload = function() {
+    //     Formio.createForm(document.getElementById('formio'), 'https://examples.form.io/example');
+    //   };
+
+
+    // Initialize the formio builder configuration (optional)
+    // Default cartegories: basic, advanced, layout, data
+    const options = {
+      builder: {
+        basic: {
+          // We can change the title of a category...
+          title: 'Basic'
+        },
+        layout: {
+          // ... or change its position...
+          weight: 100
+        },
+        // ... and even create custom categories
+        custom: {
+          title: 'Custom'
+        }
+      }
+    };
+
+    // Initialize the form.io form JSON object
+    const form = {
+      "components": []
+    }
+
+    const formio = {
+      builder: null,
+      form: null
+    };
+
+    // // Initialize the formio form instance
+    // Formio.createForm(document.getElementById('formio-form'), form)
+    //   .then((instance) => {
+    //     formio.form = instance;
+    //   });
+
+    // Formio.createForm(document.getElementById('formio-form'), {
+    //   onSubmit: function (submission) {
+    //     console.log(submission.data,"dataaaaaaaaaaaaaaa");
+    //     // Do something with the form data here
+    //   }
+    // });
+
+    // Initialize the formio form instance
+    Formio.createForm(document.getElementById('formio-form'), form)
+      .then((instance) => {
+        // console.log(instance.components[0].component,"instance")
+        formio.form = instance;
+
+        // Attach onSubmit callback function to the form instance
+        instance.on('submit', (submission) => {
+          console.log(submission.data);
+          // Do something with the form data here
+        });
+      });
+
+
+    // Initialize the formio builder instance
+    Formio.builder(document.getElementById('formio-builder'), form, options)
+      .then((instance) => {
+        formio.builder = instance;
+        // Define the on render event of the formio builder instance
+        formio.builder.on('render', () => {
+          // Update the formio form object and re render the form
+          formio.form.form = form;
+          formio.form.render();
+
+          // Update the json code using Prism.js
+          console.log(form, "form")
+          document.querySelector('code').innerHTML = Prism.highlight(JSON.stringify(form, null, 2), Prism.languages.json, 'json');
+        });
+        document.querySelector('code').innerHTML = Prism.highlight(JSON.stringify(form, null, 2), Prism.languages.json, 'json');
+      });
+
+
+
+
+    // $.ajax({
+    //   url: 'https://api.form.io/formio-form/submission',
+    //   type: 'GET',
+    //   dataType: 'json',
+    //   success: function (data) {
+    //     console.log(data);
+    //     // Do something with the data here
+    //   },
+    //   error: function (error) {
+    //     console.log(error);
+    //   }
+    // });
+
+  </script>
+</body>
+
+</html>
